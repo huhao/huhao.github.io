@@ -89,37 +89,43 @@ function getOp2(operator, q_number) {
 
 
 // 两位数连加连减混合
-function getOp3(operator, min, max) {
-  let operatorStr1 = operator[Math.floor(Math.random() * operator.length)];
-  let operatorStr2 = operator[Math.floor(Math.random() * operator.length)];
-  let num1 = randomRange(min, max);
-  let num2 = randomRange(min, max);
-  let num3 = randomRange(min, max);
+function getOp3(operator, q_number) {
 
-  if (operatorStr1 === "+") {
-    if (operatorStr2 === "-") {
-        result1 = num1 + num2
-        if (result1 < num3) {
-            operatorStr2 = "+"
-        }
+  let min = 10, max = 99;
+  let p = []
+  for (let i = 0; i < q_number; i++) {
+    let operatorStr1 = operator[Math.floor(Math.random() * operator.length)];
+    let operatorStr2 = operator[Math.floor(Math.random() * operator.length)];
+    let num1 = randomRange(min, max);
+    let num2 = randomRange(min, max);
+    let num3 = randomRange(min, max);
+
+    if (operatorStr1 === "+") {
+      if (operatorStr2 === "-") {
+          result1 = num1 + num2
+          if (result1 < num3) {
+              operatorStr2 = "+"
+          }
+      }
     }
+
+    if (operatorStr1 === "-") {
+          if (num1 < num2) {
+              [num1, num2] = [num2, num1];
+          }
+
+          if (operatorStr2 === "-") {
+              result1 = num1 - num2
+              if (result1 < num3) {
+                  operatorStr2 = "+"
+              }
+          }
+      }
+
+    let problem = `${num1} ${operatorStr1} ${num2} ${operatorStr2} ${num3} =    `;
+    p.push(problem)
   }
-
-  if (operatorStr1 === "-") {
-        if (num1 < num2) {
-            [num1, num2] = [num2, num1];
-        }
-
-        if (operatorStr2 === "-") {
-            result1 = num1 - num2
-            if (result1 < num3) {
-                operatorStr2 = "+"
-            }
-        }
-    }
-
-  let problem = `${num1} ${operatorStr1} ${num2} ${operatorStr2} ${num3} =    `;
-  return problem;
+  return p;
 }
 
 // 表内乘加混合
