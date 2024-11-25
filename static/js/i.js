@@ -180,9 +180,11 @@ function getOp4(q_number) {
       }
 
       if (leftOrRightStr === "right") {
+        console.log("d1", num3)
         if (num3 > result) {
           num3 = randomRange(1, result);
         }
+        console.log("d2", num3)
         expr = `${num1} × ${num2} - ${num3} =    `
       }
 
