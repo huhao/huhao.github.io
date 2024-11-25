@@ -40,32 +40,51 @@ function getOp1(operator, q_number) {
 
 
 // 两位数加减混合
-function getOp2(operator, min, max) {
-  let operatorStr = operator[Math.floor(Math.random() * operator.length)];
-  let i = Math.floor(Math.random() * 2);
-  let num1 = randomRange(min, max);
-  let num2 = randomRange(min, max);
+function getOp2(operator, q_number) {
+  let min = 10, max = 99;
+  let plusCount = 0, minusCount = 0;
+  
 
-  let result;
-  if (operatorStr === "-") {
-    if (num1 < num2) {
-        [num1, num2] = [num2, num1];
+  let p = []
+  for (let i = 0; i < q_number; i++) {
+    let operatorStr = operator[Math.floor(Math.random() * operator.length)];
+
+    let half = q_number / 2;
+    
+    if (plusCount === half) operatorStr = "-";
+    if (minusCount === half) operatorStr = "+";
+
+    let i = Math.floor(Math.random() * 2);
+    let num1 = randomRange(min, max);
+    let num2 = randomRange(min, max);
+
+    let result;
+    if (operatorStr === "-") {
+      if (num1 < num2) {
+          [num1, num2] = [num2, num1];
+      }
+      result = num1 - num2;
+       minusCount++;
     }
-    result = num1 - num2;
-  }
 
-  if (operatorStr === "+") {
-    result = num1 + num2;
-  }
+    if (operatorStr === "+") {
+      result = num1 + num2;
+      plusCount++;
+    }
 
-  let problem;
-  if (i === 0) {
-      problem = `(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) ${operatorStr} ${num2} = ${result}`;
-  } else {
-      problem = `${num1} ${operatorStr} (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) = ${result}`;
+    let problem;
+    if (i === 0) {
+        problem = `(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) ${operatorStr} ${num2} = ${result}`;
+    } else {
+        problem = `${num1} ${operatorStr} (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) = ${result}`;
+    }
+
+    p.push(problem)
+
   }
   
-  return problem;
+  console.log(`plusCount: ${plusCount}, minusCount: ${minusCount}   `)
+  return p;
 }
 
 
