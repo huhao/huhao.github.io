@@ -12,13 +12,8 @@ function getOp1(operator, q_number) {
 
     let half = q_number / 2;
     
-    if (plusCount === half) {
-      operatorStr = "-";
-    }
-
-    if (minusCount === half) {
-      operatorStr = "+";
-    }
+    if (plusCount === half) operatorStr = "-";
+    if (minusCount === half) operatorStr = "+";
 
     let num1 = randomRange(min, max);
     let num2 = randomRange(min, max);
@@ -29,37 +24,9 @@ function getOp1(operator, q_number) {
 
     if (operatorStr === "-") {
 
-      if (num1 == num2) {
-        num2 = randomRange(min, max);
-      }
-
-      let num1_unit_one = get_unit_one(num1);
-      let num2_unit_one = get_unit_one(num2);
-      let num1_unit_ten = get_unit_ten(num1);
-      let num2_unit_ten = get_unit_ten(num2);
-
-      if (num1_unit_ten == num2_unit_ten || num1_unit_one == num2_unit_one) {
-        num2 = randomRange(min, max);
-      }
-
       if (num1 < num2) {
           [num1, num2] = [num2, num1];
       }
-
-      num1_unit_one = get_unit_one(num1);
-      num2_unit_one = get_unit_one(num2);
-
-
-      if (num1_unit_one > num2_unit_one) {
-          [num1_unit_one, num2_unit_one] = [num2_unit_one, num1_unit_one];
-          let num1_unit_ten = get_unit_ten(num1);
-          let num2_unit_ten = get_unit_ten(num2);
-
-          num1 = (num1_unit_ten) * 10 + num1_unit_one;
-          num2 = (num2_unit_ten) * 10 + num2_unit_one;
-      }
-
-
 
       minusCount++;
     }
@@ -67,6 +34,7 @@ function getOp1(operator, q_number) {
     let problem = `${num1} ${operatorStr} ${num2} =    `
     p.push(problem)
   }
+  console.log(`plusCount: ${plusCount}, minusCount: ${minusCount}   `)
   return p;
 }
 
@@ -198,6 +166,7 @@ function getOp4(q_number) {
     }
     
   }
+  console.log(`plusCount: ${plusCount}, minusCount: ${minusCount}   `)
   return p;
 }
 
