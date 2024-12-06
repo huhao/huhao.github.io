@@ -197,6 +197,119 @@ function getOp4(q_number) {
   return p;
 }
 
+/*
+ * 表内加减乘除混合
+ * 例：47 + 3 * 7
+ * 例：47 + 27 ÷ 3
+*/
+function getOp5(q_number) {
+  
+  let operator = ["+", "-"], leftOrRight = ["left", "right"];
+  let multiplyDivideOperator = ["×", "÷"];
+
+  let min = 10, max = 99;
+  let multiplyMin = 1, multiplyMax = 9;
+
+  let plusCount = 0, minusCount = 0;
+  let multiplyCount = 0, divideCount = 0;
+  
+  let p = []
+  for (let i = 0; i < q_number; i++) {
+    let operatorStr = operator[Math.floor(Math.random() * operator.length)];
+    let multiplyDivideOperatorStr = multiplyDivideOperator[Math.floor(Math.random() * multiplyDivideOperator.length)];
+    console.log(operatorStr, multiplyDivideOperatorStr)
+    let leftOrRightStr = leftOrRight[Math.floor(Math.random() * leftOrRight.length)];
+    let num1 = randomRange(multiplyMin, multiplyMax);
+    let num2 = randomRange(multiplyMin, multiplyMax);
+    let result = num1 * num2;
+    let num3 = randomRange(1, 99);
+
+    let half = q_number / 2;
+    
+    if (plusCount === half) operatorStr = "-";
+    if (minusCount === half) operatorStr = "+";
+    if (multiplyCount === half) multiplyDivideOperatorStr = "÷";
+    if (divideCount === half) multiplyDivideOperatorStr = "×";
+    
+    if (operatorStr === "+") {
+      let expr = "";
+      if (leftOrRightStr === "left") {
+
+        if (multiplyDivideOperatorStr === "×") {
+          expr = `${num3} + ${num1} × ${num2} =    `
+          multiplyCount++;
+        } else {
+          expr = `${num3} + ${result} ÷ ${num1} =    `
+          divideCount++;
+        }
+
+      }
+
+      if (leftOrRightStr === "right") {
+        
+        if (multiplyDivideOperatorStr === "×") {
+          expr = `${num1} × ${num2} + ${num3} =    `
+          multiplyCount++;
+        } else {
+          expr = `${result} ÷ ${num1} + ${num3} =    `
+          divideCount++;
+        }
+      }
+
+      plusCount++;
+      p.push(expr)
+    }
+
+    if (operatorStr === "-") {
+      let expr = "";
+      if (leftOrRightStr === "left") {
+
+        if (multiplyDivideOperatorStr === "×") {
+          if (num3 < result) {
+            num3 = randomRange(result, 99);
+          }
+          expr = `${num3} - ${num1} × ${num2} =    `
+          multiplyCount++;
+        } else {
+          let divideResult = result / num1;
+          if (num3 < divideResult) {
+            num3 = randomRange(divideResult, 99);
+          }
+          expr = `${num3} - ${result} ÷ ${num1} =    `
+          divideCount++;
+        }
+
+
+      }
+
+      if (leftOrRightStr === "right") {
+
+        if (multiplyDivideOperatorStr === "×") {
+          if (num3 > result) {
+            num3 = randomRange(1, result);
+          }
+          expr = `${num1} × ${num2} - ${num3} =    `
+          multiplyCount++;
+        } else {
+          let divideResult = result / num1;
+          if (num3 > divideResult) {
+            num3 = randomRange(1, divideResult);
+          }
+          expr = `${result} ÷ ${num1} - ${num3} =    `
+          divideCount++;
+        }
+
+
+      }
+
+      minusCount++;
+      p.push(expr)
+    }
+    
+  }
+  return p;
+}
+
 function randomRangeOneToNine() {
   return Math.floor(Math.random() * 9 + 1);
 }

@@ -72,6 +72,10 @@
                 problems = getOp4(q_number)
             }
 
+            if (q_type === "5") {
+                problems = getOp5(q_number)
+            }
+
             return {
                 problems: problems
             };
@@ -89,7 +93,8 @@
                     <option value="1">两位数加减混合</option>
                     <option value="2">两位数加减混合(填括号)</option>
                     <option value="3">两位数连加连减混合</option>
-                    <option value="4">表内乘加减混合</option>
+                    <option value="4">表内加减乘混合</option>
+                    <option value="5">表内加减乘除混合</option>
                 </select>
                 <label for="q_type">题型</label>
             </div>
