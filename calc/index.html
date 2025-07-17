@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="static/css/paper.css">
+    <link rel="stylesheet" type="text/css" href="static/css/style.css">
+    <script type="text/javascript" src="static/js/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="static/js/jquery.PrintArea.js"></script>
+    <script type="text/javascript" src="static/js/i.js"></script>
+    <script type="text/javascript">
+
+
+        $(function(){
+
+            $("#printButton").click(function() {
+                
+                $("#printArea").printArea();
+            })
+
+            $("#q_generate").click(function() {
+                $("#printArea").empty();
+                let q_number = $("#q_number option:selected").val()
+                let q_type = $("#q_type option:selected").val()
+                let data = generate(q_number, q_type)
+                let problems = data['problems']
+
+                html = "<table>"
+                html += "<tbody>"
+                html += "<tr>"
+                for (let i = 1; i < problems.length + 1; i++) {
+                    html += `<td>${problems[i - 1]}</td>`;
+                    if (Math.round(i % 4) === 0 ) {
+                        html += "</tr>"
+                        html += "<tr>"
+                    }
+                    
+                }
+                html += "</tr>"
+                html += "</tbody>"
+                html += "</table>"
+                $("#printArea").append(html)
+            })
+            
+        })
+
+        function generate(
+            q_number,
+            q_type,
+            operator = ["+", "-"]
+        ) {
+            const problems = [];
+            max = 100
+            min = 10
+
+            for (var i = 0; i < q_number; i++) {
+
+                let p;
+                if (q_type === "1") {
+                    p = getOp1(operator, min, max)
+                }
+
+                if (q_type === "2") {
+                    p = getOp2(operator, min, max)
+                }
+
+                if (q_type === "3") {
+                    p = getOp3(operator, min, max)
+                }
+                problems.push(p);
+
+            }
+            
+            return {
+                problems: problems
+            };
+        } 
+    </script>
+
+</head>
+<body>
+    <div class="container text-center">
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-floating">
+                <select class="form-select" id="q_type">
+                    <option value="1">两位数加减混合</option>
+                    <option value="2">两位数加减混合(填括号)</option>
+                    <option value="3">两位数连加连减混合</option>
+                </select>
+                <label for="q_type">题型</label>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-floating">
+                <select class="form-select" id="q_number">
+                    <option selected value=20>20</option>
+                    <option value=100>100</option>
+                </select>
+                <label for="q_number">题数</label>
+            </div>
+        </div>
+        <div class="col-md-1 align-self-center">
+            <button type="button" class="btn btn-outline-success btn-sm" id="q_generate">生成</button>
+        </div>
+        <div class="col-md-1 align-self-center">
+            <button type="button" class="btn btn-outline-success btn-sm" id="printButton">打印</button>
+        </div>
+    <div class="col">
+    </div>
+    <div class="col">
+    </div>
+  </div>
+  <div class="row">
+    <div class="A4" id="printArea">
+    </div>
+  </div>
+        
+</div>
+
+
+
+
+</body>
+</html>
