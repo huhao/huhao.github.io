@@ -70,6 +70,11 @@
                 if (q_type === "3") {
                     p = getOp3(operator, min, max)
                 }
+
+                if (q_type === "4") {
+                    p = getOp4()
+                }
+
                 problems.push(p);
 
             }
@@ -91,6 +96,7 @@
                     <option value="1">两位数加减混合</option>
                     <option value="2">两位数加减混合(填括号)</option>
                     <option value="3">两位数连加连减混合</option>
+                    <option value="4">多位数乘一位数</option>
                 </select>
                 <label for="q_type">题型</label>
             </div>

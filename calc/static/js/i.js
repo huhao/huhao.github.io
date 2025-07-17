@@ -115,3 +115,26 @@ function getOp3(operator, min, max) {
   let problem = `${num1} ${operatorStr1} ${num2} ${operatorStr2} ${num3} =    `;
   return problem;
 }
+
+// 多位数乘除一位数
+function getOp4() {
+  const operator = ["×", "÷"]
+  const operatorStr = operator[Math.floor(Math.random() * operator.length)];
+  let num1, num2;
+  if (operatorStr === "÷") {
+    // 先随机选一个除数 num2（1~9）
+    num2 = randomRange(1, 9);
+    // 商是 1~Math.floor(99 / num2)，保证 num1 不超过 99
+    const quotient = randomRange(1, Math.floor(99 / num2));
+    num1 = num2 * quotient; // 确保能整除
+  } else {
+    // 乘法：num1 是 1~99，num2 是 1~9
+    num1 = randomRange(1, 99);
+    num2 = randomRange(1, 9);
+    if (Math.random() < 0.5) {
+      [num1, num2] = [num2, num1];
+    }
+  }
+
+  return `${num1} ${operatorStr} ${num2} =    `;
+}
