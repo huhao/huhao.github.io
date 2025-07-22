@@ -18,39 +18,6 @@ function getOp1(operator, min, max) {
   return problem;
 }
 
-// 两位数加减混合
-function getOp1(operator, min, max) {
-  let operatorStr = operator[Math.floor(Math.random() * operator.length)];
-  let num1 = randomRange(min, max);
-  let num2 = randomRange(min, max);
-
-  if (operatorStr === "-") {
-    if (num1 < num2) {
-        [num1, num2] = [num2, num1];
-    }
-  }
-
-  let problem = `${num1} ${operatorStr} ${num2} =    `;
-  return problem;
-}
-
-
-// 两位数加减混合
-function getOp1(operator, min, max) {
-  let operatorStr = operator[Math.floor(Math.random() * operator.length)];
-  let i = Math.floor(Math.random() * 2);
-  let num1 = randomRange(min, max);
-  let num2 = randomRange(min, max);
-
-  if (operatorStr === "-") {
-    if (num1 < num2) {
-        [num1, num2] = [num2, num1];
-    }
-  }
-
-  let problem = `${num1} ${operatorStr} ${num2} =    `;
-  return problem;
-}
 
 // 两位数加减混合
 function getOp2(operator, min, max) {

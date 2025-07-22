@@ -10,6 +10,7 @@
     <script type="text/javascript" src="static/js/jquery-3.7.1.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="static/js/jquery.PrintArea.js"></script>
+    <script type="text/javascript" src="static/js/functions.js"></script>
     <script type="text/javascript" src="static/js/i.js"></script>
     <script type="text/javascript">
 
@@ -25,24 +26,30 @@
                 $("#printArea").empty();
                 let q_number = $("#q_number option:selected").val()
                 let q_type = $("#q_type option:selected").val()
-                let data = generate(q_number, q_type)
-                let problems = data['problems']
+                let q_part = +$("#q_part option:selected").val()
+                for (let p = 1; p < q_part + 1; p++) {
+                    let data = generate(q_number, q_type)
+                    let problems = data['problems']
 
-                html = "<table>"
-                html += "<tbody>"
-                html += "<tr>"
-                for (let i = 1; i < problems.length + 1; i++) {
-                    html += `<td>${problems[i - 1]}</td>`;
-                    if (Math.round(i % 4) === 0 ) {
-                        html += "</tr>"
-                        html += "<tr>"
+                    html = "<table>"
+                    html += "<tbody>"
+                    html += "<tr>"
+                    for (let i = 1; i < problems.length + 1; i++) {
+                        html += `<td>${problems[i - 1]}</td>`;
+                        if (Math.round(i % 4) === 0 ) {
+                            html += "</tr>"
+                            html += "<tr>"
+                        }
+                        
                     }
+                    html += "</tr>"
+                    html += "</tbody>"
+                    html += "</table>"
                     
+                    $("#printArea").append(html)
                 }
-                html += "</tr>"
-                html += "</tbody>"
-                html += "</table>"
-                $("#printArea").append(html)
+
+
             })
             
         })
@@ -101,13 +108,23 @@
                 <label for="q_type">题型</label>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-1">
             <div class="form-floating">
                 <select class="form-select" id="q_number">
                     <option selected value=20>20</option>
                     <option value=100>100</option>
                 </select>
                 <label for="q_number">题数</label>
+            </div>
+        </div>
+        <div class="col-md-1">
+            <div class="form-floating">
+                <select class="form-select" id="q_part">
+                    <option selected value=1>1</option>
+                    <option value=2>2</option>
+                    <option value=4>4</option>
+                </select>
+                <label for="q_part">份数</label>
             </div>
         </div>
         <div class="col-md-1 align-self-center">
