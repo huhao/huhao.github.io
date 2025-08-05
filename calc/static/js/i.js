@@ -83,7 +83,7 @@ function getOp3(operator, min, max) {
   return problem;
 }
 
-// 多位数乘除一位数
+
 function getOp4() {
   const operator = ["×", "÷"]
   const operatorStr = operator[Math.floor(Math.random() * operator.length)];
@@ -97,7 +97,7 @@ function getOp4() {
   } else {
     // 乘法：num1 是 1~99，num2 是 1~9
     num1 = randomRange(1, 99);
-    num2 = randomRange(1, 9);
+    num2 = randomRange(1, 99);
     if (Math.random() < 0.5) {
       [num1, num2] = [num2, num1];
     }
