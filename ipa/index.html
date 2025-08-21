@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国际音标48个发音学习</title>
+    <script src="static/js/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/7.0.0/css/all.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin: 30px 0 40px;
+            padding: 20px 0;
+            border-bottom: 2px solid #2196F3;
+        }
+        
+        .phonetic-section {
+            margin-bottom: 50px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            text-align: center;
+            color: #2196F3;
+            margin-bottom: 30px;
+            font-size: 24px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .phonetic-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .phonetic-card {
+            width: 130px;
+            height: 280px; /* 增加高度以容纳单词音标 */
+            background-color: #fafafa;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 锁定状态的卡片样式 */
+        .phonetic-card.locked {
+            filter: grayscale(80%);
+            opacity: 0.8;
+        }
+        
+        .phonetic-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        
+        /* 锁定卡片的悬停效果稍弱 */
+        .phonetic-card.locked:hover {
+            transform: translateY(-3px) scale(1.01);
+        }
+        
+        .phonetic-symbol {
+            font-size: 52px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* 播放按钮容器 */
+        .play-buttons-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        /* 优化的播放按钮样式 */
+        .play-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* 锁定状态的播放按钮 */
+        .phonetic-card.locked .play-button,
+        .phonetic-card.locked .word-item {
+            background-color: #cccccc !important;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* 不同类型播放按钮的颜色区分 */
+        .play-button.primary {
+            background-color: #2196F3;
+        }
+        
+        .play-button.secondary {
+            background-color: #4CAF50;
+        }
+        
+        .play-button.tertiary {
+            background-color: #FF9800;
+        }
+        
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .play-button.primary:hover {
+            background-color: #0b7dda;
+        }
+        
+        .play-button.secondary:hover {
+            background-color: #3d9140;
+        }
+        
+        .play-button.tertiary:hover {
+            background-color: #e68900;
+        }
+        
+        .play-button i {
+            font-size: 16px;
+        }
+        
+        .play-button.playing, .word-item.playing {
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* 播放按钮功能标签 */
+        .button-label {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            margin-top: 3px;
+        }
+        
+        
+        /* 示例单词样式 */
+        .example-words {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            margin: 5px 0 5px;
+            padding: 5px 0;
+            width: 100%;
+        }
+        
+        .word-item {
+            font-size: 12px;
+            color: #333;
+            background-color: #f0f7ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .word-item:hover {
+            background-color: #e1f0fe;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* 单词音标样式 - 默认显示 */
+        .word-phonetic {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            margin: 2px 0 4px;
+            min-height: 14px;
+            opacity: 1; /* 默认显示 */
+            transition: opacity 0.3s ease;
+        }
+        
+        /* 高亮相同的音标部分 */
+        .phonetic-highlight {
+            color: #2196F3;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        
+        .audio-player {
+            display: none;
+        }
+        
+        /* 锁图标容器 */
+        .lock-container {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            perspective: 100px;
+            z-index: 10;
+        }
+        
+        /* 锁图标样式 */
+        .lock-icon {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transform-style: preserve-3d;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .lock-icon i {
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        
+        /* 锁定状态图标 */
+        .lock-icon.locked i {
+            color: #e74c3c; /* 红色表示锁定 */
+        }
+        
+        /* 解锁状态图标 */
+        .lock-icon.unlocked i {
+            color: #28a745; /* 绿色表示解锁 */
+        }
+        
+        /* 锁定提示覆盖层 */
+        .lock-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+        
+        .phonetic-card.locked:hover .lock-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .lock-overlay i {
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: #e74c3c;
+        }
+        
+        .lock-overlay span {
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .unlock-btn {
+            padding: 6px 12px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+        
+        .unlock-btn:hover {
+            background-color: #0b7dda;
+        }
+        
+        /* 播放动画 */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+            }
+        }
+        
+        .play-button.secondary.playing {
+            animation: pulse-secondary 1.5s infinite;
+        }
+        
+        @keyframes pulse-secondary {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+        
+        .play-button.tertiary.playing {
+            animation: pulse-tertiary 1.5s infinite;
+        }
+        
+        @keyframes pulse-tertiary {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>国际音标48个发音学习</h1>
+
+    
+    <!-- 上栏：元音 -->
+    <div class="phonetic-section">
+        <h2 class="section-title">元音 (20个)</h2>
+        <div class="phonetic-container">
+            <!-- 第一个音标已锁定 -->
+            <div class="phonetic-card locked">
+                <div class="lock-container">
+                    <div class="lock-icon locked">
+                        <i class="fa fa-lock"></i>
+                    </div>
+                </div>
+                <div class="lock-overlay">
+                    <i class="fa fa-lock"></i>
+                    <span>此音标已锁定</span>
+                    <button class="unlock-btn" data-target="iː">解锁</button>
+                </div>
+                <div class="phonetic-symbol">/iː/</div>
+                <div class="play-buttons-container">
+                    <button class="play-button primary" data-sound="iː-1">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <button class="play-button secondary" data-sound="iː-2">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <button class="play-button tertiary" data-sound="iː-3">
+                        <i class="fa fa-play"></i>
+                    </button>
+                </div>
+
+                <!-- 示例单词，带有音标和音频数据属性 -->
+                <div class="example-words">
+                    <div>
+                        <span class="word-item" data-phonetic="/siː/" data-sound="word-see">see</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                    <div>
+                        <span class="word-item" data-phonetic="/biː/" data-sound="word-bee">bee</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                    <div>
+                        <span class="word-item" data-phonetic="/ʃiːp/" data-sound="word-sheep">sheep</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                </div>
+
+                <audio class="audio-player" id="sound-iː-1" src="sounds/iː-1.mp3"></audio>
+                <audio class="audio-player" id="sound-iː-2" src="sounds/iː-2.mp3"><RichMediaReference>
+                <audio class="audio-player" id="sound-iː-3" src="sounds/iː-3.mp3"><RichMediaReference>
+                <!-- 单词音频 -->
+                <audio class="audio-player" id="sound-word-see" src="sounds/words/see.mp3"><RichMediaReference>
+                <audio class="audio-player" id="sound-word-bee" src="sounds/words/bee.mp3">superscript:
+                <audio class="audio-player" id="sound-word-sheep" src="sounds/words/sheep.mp3">superscript:
+            </div>
+            
+            <div class="phonetic-card locked">
+                <div class="lock-container">
+                    <div class="lock-icon unlocked">
+                        <i class="fa fa-unlock"></i>
+                    </div>
+                </div>
+                <div class="phonetic-symbol">/ɪ/</div>
+                <div class="play-buttons-container">
+                    <button class="play-button primary" data-sound="ɪ-1">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <button class="play-button secondary" data-sound="ɪ-2">
+                        <i class="fa fa-play"></i>
+                    </button>
+                </div>
+                <!-- 示例单词 -->
+                <div class="example-words">
+                    <div>
+                        <span class="word-item" data-phonetic="/sɪt/" data-sound="word-sit">sit</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                    <div>
+                        <span class="word-item" data-phonetic="/bɪɡ/" data-sound="word-big">big</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                </div>
+
+                <audio class="audio-player" id="sound-ɪ-1" src="sounds/ɪ-1.mp3"><RichMediaReference>
+                <audio class="audio-player" id="sound-ɪ-2" src="sounds/ɪ-2.mp3"><RichMediaReference>
+                <!-- 单词音频 -->
+                <audio class="audio-player" id="sound-word-sit" src="sounds/words/sit.mp3"><RichMediaReference>
+                <audio class="audio-player" id="sound-word-big" src="sounds/words/big.mp3"><RichMediaReference>
+            </div>
+            
+            <div class="phonetic-card locked">
+                <div class="lock-container">
+                    <div class="lock-icon unlocked">
+                        <i class="fa fa-unlock"></i>
+                    </div>
+                </div>
+                <div class="phonetic-symbol">/e/</div>
+                <div class="play-buttons-container">
+                    <button class="play-button primary" data-sound="e-1">
+                        <i class="fa fa-play"></i>
+                    </button>
+                </div>
+                <!-- 示例单词 -->
+                <div class="example-words">
+                    <div>
+                        <span class="word-item" data-phonetic="/bed/" data-sound="word-bed">bed</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                </div>
+
+                <audio class="audio-player" id="sound-e-1" src="sounds/e-1.mp3"><RichMediaReference>
+                <!-- 单词音频 -->
+                <audio class="audio-player" id="sound-word-bed" src="sounds/words/bed.mp3"><RichMediaReference>
+            </div>
+            
+            <div class="phonetic-card">
+                <div class="lock-container">
+                    <div class="lock-icon unlocked">
+                        <i class="fa fa-unlock"></i>
+                    </div>
+                </div>
+                <div class="phonetic-symbol">/æ/</div>
+                <div class="play-buttons-container">
+                    <button class="play-button primary" data-sound="æ-1">
+                        <i class="fa fa-play"></i>
+                    </button>
+                </div>
+                <!-- 示例单词 -->
+                <div class="example-words">
+                    <div>
+                        <span class="word-item" data-phonetic="/kæt/" data-sound="word-cat">cat</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                    <div>
+                        <span class="word-item" data-phonetic="/hæt/" data-sound="word-hat">hat</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                    <div>
+                        <span class="word-item" data-phonetic="/mæp/" data-sound="word-map">map</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                </div>
+
+                <audio class="audio-player" id="sound-æ-1" src="static/sounds/bbc/æ.m4a">
+                <!-- 单词音频 -->
+                <audio class="audio-player" id="sound-word-cat" src="sounds/words/cat.mp3"><RichMediaReference>
+                <audio class="audio-player" id="sound-word-hat" src="sounds/words/hat.mp3"><RichMediaReference>
+                <audio class="audio-player" id="sound-word-map" src="sounds/words/map.mp3">superscript:
+            </div>
+            
+            <!-- 更多音标卡片... -->
+            <div class="phonetic-card locked">
+                <div class="lock-container">
+                    <div class="lock-icon unlocked">
+                        <i class="fa fa-unlock"></i>
+                    </div>
+                </div>
+                <div class="phonetic-symbol">/ɑː/</div>
+                <div class="play-buttons-container">
+                    <button class="play-button primary" data-sound="ɑː-1">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <button class="play-button secondary" data-sound="ɑː-2">
+                        <i class="fa fa-play"></i>
+                    </button>
+                </div>
+                <!-- 示例单词 -->
+                <div class="example-words">
+                    <div>
+                        <span class="word-item" data-phonetic="/kɑː(r)/" data-sound="word-car">car</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                    <div>
+                        <span class="word-item" data-phonetic="/hɑːd/" data-sound="word-hard">hard</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                </div>
+
+                <audio class="audio-player" id="sound-ɑː-1" src="sounds/ɑː-1.mp3">superscript:
+                <audio class="audio-player" id="sound-ɑː-2" src="sounds/ɑː-2.mp3">superscript:
+                <!-- 单词音频 -->
+                <audio class="audio-player" id="sound-word-car" src="sounds/words/car.mp3"><RichMediaReference>
+                <audio class="audio-player" id="sound-word-hard" src="sounds/words/hard.mp3">superscript:
+            </div>
+        </div>
+    </div>
+    
+    <!-- 下栏：辅音 -->
+    <div class="phonetic-section">
+        <h2 class="section-title">辅音 (28个)</h2>
+        <div class="phonetic-container">
+            <!-- 爆破音 -->
+            <div class="phonetic-card locked">
+                <div class="lock-container">
+                    <div class="lock-icon unlocked">
+                        <i class="fa fa-unlock"></i>
+                    </div>
+                </div>
+                <div class="phonetic-symbol">/p/</div>
+                <div class="play-buttons-container">
+                    <button class="play-button primary" data-sound="p-1">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <button class="play-button secondary" data-sound="p-2">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <button class="play-button tertiary" data-sound="p-3">
+                        <i class="fa fa-play"></i>
+                    </button>
+                </div>
+                <!-- 示例单词 -->
+                <div class="example-words">
+                    <div>
+                        <span class="word-item" data-phonetic="/pen/" data-sound="word-pen">pen</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                    <div>
+                        <span class="word-item" data-phonetic="/pɪɡ/" data-sound="word-pig">pig</span>
+                        <div class="word-phonetic"></div>
+                    </div>
+                </div>
+
+                <audio class="audio-player" id="sound-p-1" src="sounds/p-1.mp3"><RichMediaReference>
+                <audio class="audio-player" id="sound-p-2" src="sounds/p-2.mp3"><RichMediaReference>
+                <audio class="audio-player" id="sound-p-3" src="sounds/p-3.mp3"><RichMediaReference>
+                <!-- 单词音频 -->
+                <audio class="audio-player" id="sound-word-pen" src="sounds/words/pen.mp3">superscript:
+                <audio class="audio-player" id="sound-word-pig" src="sounds/words/pig.mp3">superscript:
+            </div>
+            
+            <!-- 更多音标卡片... -->
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // 页面加载时处理音标显示和高亮
+            highlightMatchingPhonetics();
+            
+            // 播放按钮功能
+            $('.play-button').click(function() {
+                // 如果卡片是锁定状态，不执行播放
+                if ($(this).closest('.phonetic-card').hasClass('locked')) {
+                    return;
+                }
+                
+                var $button = $(this);
+                var soundId = 'sound-' + $button.data('sound');
+                playAudio($button, soundId);
+            });
+            
+            // 单词点击播放功能 - 只播放发音，不控制音标显示
+            $('.word-item').click(function() {
+                // 如果卡片是锁定状态，不执行播放
+                if ($(this).closest('.phonetic-card').hasClass('locked')) {
+                    return;
+                }
+                
+                var $word = $(this);
+                var soundId = 'sound-' + $word.data('sound');
+                
+                playAudio($word, soundId);
+            });
+            
+            // 解锁按钮功能
+            $('.unlock-btn').click(function() {
+                var target = $(this).data('target');
+                var card = $(this).closest('.phonetic-card');
+                
+                // 解锁逻辑
+                card.removeClass('locked');
+                card.find('.lock-icon').removeClass('locked').addClass('unlocked');
+                card.find('.lock-icon i').removeClass('fa-lock').addClass('fa-unlock');
+                
+                // 解锁后重新处理音标高亮
+                highlightMatchingPhonetics();
+                
+                // 解锁成功提示
+                alert('音标 /' + target + '/ 已成功解锁！');
+            });
+            
+            // 播放音频的通用函数
+            function playAudio($element, soundId) {
+                // 如果当前正在播放，点击则停止
+                if ($element.hasClass('playing')) {
+                    $('#' + soundId)[0].pause();
+                    resetAllAudio();
+                    return;
+                }
+                
+                // 停止所有正在播放的音频并重置状态
+                resetAllAudio();
+                
+                // 播放当前音频
+                var audioElement = $('#' + soundId)[0];
+                if (audioElement) {
+                    audioElement.play().then(function() {
+                        // 播放成功，更新元素状态
+                        $element.addClass('playing');
+                        if ($element.hasClass('play-button')) {
+                            $element.find('i').removeClass('fa-play').addClass('fa-pause');
+                        }
+                    }).catch(function(e) {
+                        console.log('音频播放失败:', e);
+                        alert('音频播放失败，请检查文件路径或浏览器设置');
+                    });
+                    
+                    // 音频播放结束后恢复状态
+                    audioElement.onended = function() {
+                        resetAllAudio();
+                    };
+                }
+            }
+            
+            // 重置所有音频和播放状态
+            function resetAllAudio() {
+                // 重置播放按钮
+                $('.play-button').removeClass('playing');
+                $('.play-button i').removeClass('fa-pause').addClass('fa-play');
+                
+                // 重置单词
+                $('.word-item').removeClass('playing');
+                
+                // 暂停所有音频
+                $('.audio-player').each(function() {
+                    this.pause();
+                    this.currentTime = 0;
+                });
+            }
+            
+            // 高亮单词音标中与卡片音标相同的部分
+            function highlightMatchingPhonetics() {
+                $('.phonetic-card').each(function() {
+                    var $card = $(this);
+                    // 获取卡片的音标（去除前后的/）
+                    var cardPhonetic = $card.find('.phonetic-symbol').text().replace(/\//g, '');
+                    
+                    // 处理每个单词的音标
+                    $card.find('.word-item').each(function() {
+                        var $word = $(this);
+                        var wordPhonetic = $word.data('phonetic').replace(/\//g, '');
+                        var $phoneticDisplay = $word.next('.word-phonetic');
+                        
+                        // 找到匹配的部分并高亮
+                        var highlightedPhonetic = highlightMatches(wordPhonetic, cardPhonetic);
+                        
+                        // 显示带高亮的音标，保留前后的/
+                        $phoneticDisplay.html('/' + highlightedPhonetic + '/');
+                    });
+                });
+            }
+            
+            // 辅助函数：高亮匹配的音标部分
+            function highlightMatches(text, pattern) {
+                // 如果模式包含特殊字符（如ː），需要转义
+                var escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                // 创建正则表达式，全局匹配
+                var regex = new RegExp(escapedPattern, 'g');
+                
+                // 替换匹配的部分，添加高亮标签
+                return text.replace(regex, function(match) {
+                    return '<span class="phonetic-highlight">' + match + '</span>';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+    
