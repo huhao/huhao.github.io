@@ -49,7 +49,7 @@
         }
         
         .phonetic-card {
-            width: 130px;
+            width: 180px;
             height: 280px; /* 增加高度以容纳单词音标 */
             background-color: #fafafa;
             border-radius: 10px;
@@ -81,7 +81,7 @@
         }
         
         .phonetic-symbol {
-            font-size: 52px;
+            font-size: 64px;
             margin-bottom: 15px;
             font-weight: bold;
             color: #333;
@@ -179,10 +179,10 @@
         }
         
         .word-item {
-            font-size: 12px;
+            font-size: 14px;
             color: #333;
             background-color: #f0f7ff;
-            padding: 2px 6px;
+            padding: 2px 12px;
             border-radius: 4px;
             white-space: nowrap;
             cursor: pointer;
@@ -198,10 +198,10 @@
         
         /* 单词音标样式 - 默认显示 */
         .word-phonetic {
-            font-size: 11px;
+            font-size: 12px;
             color: #666;
             text-align: center;
-            margin: 2px 0 4px;
+            margin: 4px 0 4px;
             min-height: 14px;
             opacity: 1; /* 默认显示 */
             transition: opacity 0.3s ease;
@@ -474,37 +474,44 @@
             
             <div class="phonetic-card">
                 <div class="lock-container">
-                    <div class="lock-icon unlocked">
-                        <i class="fa fa-unlock"></i>
-                    </div>
+
                 </div>
                 <div class="phonetic-symbol">/æ/</div>
                 <div class="play-buttons-container">
-                    <button class="play-button primary" data-sound="æ-1">
+                    <button class="play-button primary" data-sound="bbc-æ">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <button class="play-button secondary" data-sound="emma-æ">
+                        <i class="fa fa-play"></i>
+                    </button>
+                    <button class="play-button tertiary" data-sound="buffy-æ">
                         <i class="fa fa-play"></i>
                     </button>
                 </div>
                 <!-- 示例单词 -->
                 <div class="example-words">
                     <div>
-                        <span class="word-item" data-phonetic="/kæt/" data-sound="word-cat">cat</span>
+                        <span class="word-item" data-phonetic="/bæk/" data-sound="word-back">back</span>
                         <div class="word-phonetic"></div>
                     </div>
                     <div>
-                        <span class="word-item" data-phonetic="/hæt/" data-sound="word-hat">hat</span>
+                        <span class="word-item" data-phonetic="/mæn/" data-sound="word-man">man</span>
                         <div class="word-phonetic"></div>
                     </div>
                     <div>
-                        <span class="word-item" data-phonetic="/mæp/" data-sound="word-map">map</span>
+                        <span class="word-item" data-phonetic="/bæd/" data-sound="word-bad">bad</span>
                         <div class="word-phonetic"></div>
                     </div>
                 </div>
 
-                <audio class="audio-player" id="sound-æ-1" src="static/sounds/bbc/æ.m4a">
+                <audio class="audio-player" id="sound-bbc-æ" src="static/sounds/bbc/æ.m4a">
+                <audio class="audio-player" id="sound-emma-æ" src="static/sounds/emma/æ.m4a">
+                <audio class="audio-player" id="sound-buffy-æ" src="static/sounds/buffy/æ.m4a">
                 <!-- 单词音频 -->
-                <audio class="audio-player" id="sound-word-cat" src="sounds/words/cat.mp3"><RichMediaReference>
-                <audio class="audio-player" id="sound-word-hat" src="sounds/words/hat.mp3"><RichMediaReference>
-                <audio class="audio-player" id="sound-word-map" src="sounds/words/map.mp3">superscript:
+                <audio class="audio-player" id="sound-word-back" src="static/sounds/words/back.m4a">
+                <audio class="audio-player" id="sound-word-man" src="static/sounds/words/man.m4a">
+                <audio class="audio-player" id="sound-word-bad" src="static/sounds/words/bad.m4a">
+
             </div>
             
             <!-- 更多音标卡片... -->
