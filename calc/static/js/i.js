@@ -84,24 +84,52 @@ function getOp3(operator, min, max) {
 }
 
 
-function getOp4() {
+function getOp4(q_number) {
   const operator = ["×", "÷"]
-  const operatorStr = operator[Math.floor(Math.random() * operator.length)];
-  let num1, num2;
-  if (operatorStr === "÷") {
-    // 先随机选一个除数 num2（1~9）
-    num2 = randomRange(1, 9);
-    // 商是 1~Math.floor(99 / num2)，保证 num1 不超过 99
-    const quotient = randomRange(1, Math.floor(99 / num2));
-    num1 = num2 * quotient; // 确保能整除
-  } else {
-    // 乘法：num1 是 1~99，num2 是 1~9
-    num1 = randomRange(1, 99);
-    num2 = randomRange(1, 99);
-    if (Math.random() < 0.5) {
-      [num1, num2] = [num2, num1];
+  
+  let twoDigitMultiplyCount = 0;
+
+  const plist = [];
+  for (var i = 0; i < q_number; i++) {
+    const operatorStr = operator[Math.floor(Math.random() * operator.length)];
+    let num1, num2, p;
+    if (operatorStr === "÷") {
+      // 先随机选一个除数 num2（1~9）
+      num2 = randomRange(1, 9);
+      // 商是 1~Math.floor(99 / num2)，保证 num1 不超过 99
+      const quotient = randomRange(1, Math.floor(99 / num2));
+      num1 = num2 * quotient; // 确保能整除
+      p = `${num1} ${operatorStr} ${num2} =    `;
+    } else {
+      if (twoDigitMultiplyCount < 3) {
+        p = get2m2();
+        twoDigitMultiplyCount++;
+      } else {
+        p = get2m1();
+      }
     }
+    
+    plist.push(p);
   }
 
-  return `${num1} ${operatorStr} ${num2} =    `;
+  return plist;
+}
+
+
+function get2m1() {
+  let num1 = randomRange(1, 9);
+  let num2 = randomRange(10, 99);
+  if (Math.random() < 0.5) {
+    [num1, num2] = [num2, num1];
+  }
+  return `${num1} × ${num2} =    `;
+}
+
+function get2m2() {
+  let num1 = randomRange(10, 99);
+  let num2 = randomRange(10, 99);
+  if (Math.random() < 0.5) {
+    [num1, num2] = [num2, num1];
+  }
+  return `${num1} × ${num2} =    `;
 }
