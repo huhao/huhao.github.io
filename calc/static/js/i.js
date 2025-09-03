@@ -39,18 +39,24 @@ function getOp2(q_number) {
     } else {
        p = `${num1} ${operatorStr} ${num2} =    `;
     }
+    plist.push(p);
+  }
 
-   
-    
-    // 随机生成带括号的问题形式
-    // 
-    // if (hasBracket) {
-    //   // 括号在第一个数位置
-    //   
-    // } else {
-    //   // 括号在第二个数位置
-    //  
-    // }
+  return plist;
+}
+
+
+function getOp3(q_number) {
+  const operator = ["×", "÷"]
+  const plist = [];
+  for (var i = 0; i < q_number; i++) {
+    let operatorStr = operator[Math.floor(Math.random() * operator.length)];
+    let p;
+    if (operatorStr === "×") {
+      p = get19t19()
+    } else {
+      p = get2d1()
+    }
     
     plist.push(p);
   }
@@ -141,10 +147,10 @@ function getOp(q_number) {
     {
       case "multiply":
         if (twoDigitMultiplyCount < 3) {
-          p = get2t2();
+          p = get19t19();
           twoDigitMultiplyCount++;
         } else {
-          p = get2t1();
+          p = get19t19();
         }
         break;
       case "division":
@@ -211,4 +217,14 @@ function get2m2() {
 
 function getRandom1or2() {
     return Math.random() < 0.5 ? 1 : 2;
+}
+
+
+function get19t19() {
+  let num1 = randomRange(1, 19);
+  let num2 = randomRange(1, 19);
+  if (Math.random() < 0.5) {
+    [num1, num2] = [num2, num1];
+  }
+  return `${num1} × ${num2} =    `;
 }

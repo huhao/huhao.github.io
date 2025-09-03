@@ -68,6 +68,10 @@
                 problems = getOp2(q_number)
             }
 
+            if (q_type === "3") {
+                problems = getOp3(q_number)
+            }
+
             // for (var i = 0; i < q_number; i++) {
 
             //     let p;
@@ -105,11 +109,11 @@
         <div class="col-md-3">
             <div class="form-floating">
                 <select class="form-select" id="q_type">
-                    <!-- <option value="1">两位数加减混合</option>
+                    <!-- <option value="1">两位数加减混合</option> -->
                     
-                    <option value="3">两位数连加连减混合</option> -->
                     <option value="1">混合运算</option>
                     <option value="2">20以内加减法</option>
+                    <option value="3">19*19</option>
                 </select>
                 <label for="q_type">题型</label>
             </div>
