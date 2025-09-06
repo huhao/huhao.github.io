@@ -10,18 +10,19 @@ function getOp2(q_number) {
   let bracketCount = q_number * 0.5;
   const plist = [];
   let generatedBrackets = 0;
-  for (var i = 0; i < q_number; i++) {
+  var i = 0;
+  while (i < q_number) {
     const operatorStr = operator[Math.floor(Math.random() * operator.length)];
     let num1, num2, result, p;
     
     if (operatorStr === "+") {
       // 加法：确保两数之和不超过20
-      num1 = randomRange(0, 20);
-      num2 = randomRange(0, 20 - num1);
+      num1 = randomRange(1, 20);
+      num2 = randomRange(1, 20 - num1);
       result = num1 + num2;
     } else {
       // 减法：确保被减数大于等于减数，且结果非负
-      num2 = randomRange(0, 20);
+      num2 = randomRange(1, 20);
       num1 = randomRange(num2, 20);
       result = num1 - num2;
     }
@@ -39,6 +40,13 @@ function getOp2(q_number) {
     } else {
        p = `${num1} ${operatorStr} ${num2} =    `;
     }
+
+    if(plist.includes(p)) {
+      continue;
+    }
+
+    i += 1;
+
     plist.push(p);
   }
 
@@ -49,7 +57,10 @@ function getOp2(q_number) {
 function getOp3(q_number) {
   const operator = ["×", "÷"]
   const plist = [];
-  for (var i = 0; i < q_number; i++) {
+  
+
+  var i = 0;
+  while (i < q_number) {
     let operatorStr = operator[Math.floor(Math.random() * operator.length)];
     let p;
     if (operatorStr === "×") {
@@ -57,7 +68,12 @@ function getOp3(q_number) {
     } else {
       p = get2d1()
     }
-    
+
+    if(plist.includes(p)) {
+      continue;
+    }
+
+    i += 1;
     plist.push(p);
   }
 
