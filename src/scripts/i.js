@@ -1343,7 +1343,7 @@ function solveProblem(p) {
   
   let evalExpr = expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/\[/g, '(').replace(/\]/g, ')');
   try {
-    let res = eval(evalExpr);
+    let res = (0, eval)(evalExpr);
     if (res % 1 !== 0) {
       return parseFloat(res.toFixed(4));
     }
