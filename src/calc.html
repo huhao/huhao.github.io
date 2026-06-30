@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <script type="module" src="./scripts/calc.js"></script>
+    <style>
+        html {
+            overflow-y: scroll;
+            /* 始终显示垂直滚动条占位，从根本上解决页面抖动 */
+        }
+
+        /* 页面顶部的彩虹线 */
+        .rainbow-line {
+            height: 4px;
+            width: 100%;
+            background: linear-gradient(to right, #ff2400, #e81d1d, #e8b71d, #1de840, #1ddde8, #2b1de8, #dd00f3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+        }
+
+        /* 增强版原生分数样式 */
+        .math-expr {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Times New Roman", serif;
+            font-size: 1.1rem;
+            min-height: 2rem;
+            vertical-align: middle;
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            padding: 0 0.1rem;
+            line-height: 1;
+        }
+
+        .fraction .num {
+            border-bottom: 1.5px solid #000;
+            width: 100%;
+            text-align: center;
+            padding-top: 1px;
+            /* 增加顶部微调，防止分子贴边模糊 */
+            padding-bottom: 1px;
+            font-size: 0.95rem;
+        }
+
+        .fraction .den {
+            width: 100%;
+            text-align: center;
+            padding-top: 1px;
+            font-size: 0.95rem;
+        }
+
+        .fraction-integer {
+            font-size: 1.2rem;
+            padding: 0 0.3rem;
+        }
+
+        /* 分数填空的大括号样式 */
+        .fraction-bracket {
+            display: inline-block;
+            text-align: center;
+            font-size: 1.2rem;
+            vertical-align: middle;
+        }
+
+        /* 补全 paper.css 缺失的 5mm 内边距 */
+        .sheet.padding-5mm {
+            padding: 5mm;
+        }
+
+        /* A4 纸张内表格样式 - 屏幕与打印保持一致 */
+        #printArea table {
+            width: 100%;
+            height: 96%;
+            /* 略微降低到 96%，为打印机的非打印区域和浏览器页眉页脚留出余量 */
+            border-collapse: collapse;
+            margin-top: 0 !important;
+            table-layout: fixed;
+            /* 固定布局，确保单元格均匀分布 */
+        }
+
+        #printArea table td {
+            padding: 1px 2px !important;
+            height: 4%;
+            /* 100题共25行，100/25=4%，确保完美铺满全页 */
+            font-size: 0.9rem !important;
+            line-height: 1.2;
+            white-space: nowrap;
+            vertical-align: middle;
+            border: none !important;
+            text-align: left;
+        }
+
+        /* 打印专用样式 */
+        @media print {
+            .rainbow-line {
+                display: none;
+            }
+
+            .math-expr {
+                font-size: 0.95rem !important;
+            }
+
+            .sheet {
+                overflow: hidden !important;
+                /* 强制隐藏，防止产生多余空白页 */
+                height: 285mm !important;
+                /* 略微调低以增加打印容错，确保只生成单页 */
+            }
+
+            /* 强制背景和颜色在打印时生效 */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+
+        /* A4 纸张仿真样式 (仅在屏幕显示且在打印区域内生效) */
+        @media screen {
+            #printArea .sheet {
+                margin: 20px auto !important;
+                width: 210mm;
+                height: 297mm;
+                /* 标准 A4 高度 */
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+                background: white;
+                float: none !important;
+                position: relative;
+                box-sizing: border-box;
+                overflow: visible !important;
+                /* 屏幕预览时不截断，方便发现排版溢出 */
+            }
+        }
+
+        /* 打印时移除仿真边框 */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            #printArea .sheet {
+                margin: 0 !important;
+                padding: 5mm !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+    <script type="module">
+
+
+        $(function () {
+            function updateRatio() {
+                let total = +$("#q_number").val();
+                let mul = Math.floor(total / 2);
+                $("#q_mul_num").val(mul).attr('max', total);
+                $("#q_div_num").val(total - mul);
+
+                let bracket = total === 100 ? 30 : Math.floor(total / 2);
+                $("#q_bracket_num").val(bracket).attr('max', total);
+            }
+
+            $("#q_type").change(function () {
+                $("#printArea").empty();
+                let type = $(this).val();
+
+                // 1. 比例设置可见性及标签 (题型 1, 3, 4, 5)
+                if (type === "1" || type === "3" || type === "4" || type === "5") {
+                    $("#ratio_settings").show();
+                    if (type === "1" || type === "4" || type === "5") {
+                        $("#ratio_label_plus_mul").text("+");
+                        $("#ratio_label_minus_div").text("-");
+                    } else {
+                        $("#ratio_label_plus_mul").text("×");
+                        $("#ratio_label_minus_div").text("÷");
+                    }
+                } else {
+                    $("#ratio_settings").hide();
+                }
+
+                // 2. 填空设置 (始终显示)
+                $("#bracket_settings").show();
+
+                // 3. 特殊模式设置 (题型 1, 3, 4, 6)
+                if (type === "1" || type === "3" || type === "4" || type === "6") {
+                    $("#mode_settings").show();
+                    // 仅题型 4 (三个数) 支持下拉切换
+                    if (type === "4") {
+                        $("#q_mode_teach_opt").show();
+                        $("#q_mode_select").prop("disabled", false);
+                    } else {
+                        $("#q_mode_teach_opt").hide();
+                        $("#q_mode_select").val("hard").prop("disabled", true);
+                    }
+                } else {
+                    $("#mode_settings").hide();
+                    $("#q_mode_enable").prop("checked", false);
+                }
+            }).trigger('change');
+
+
+
+            $("#q_mul_num").on('input', function () {
+                let total = +$("#q_number").val();
+                let mul = +$(this).val();
+                if (mul > total) mul = total;
+                if (mul < 0) mul = 0;
+                $(this).val(mul);
+                $("#q_div_num").val(total - mul);
+            });
+
+            $("#q_bracket_num").on('input', function () {
+                let total = +$("#q_number").val();
+                let val = +$(this).val();
+                if (val > total) val = total;
+                if (val < 0) val = 0;
+                $(this).val(val);
+            });
+
+            updateRatio();
+
+            $("#printButton").click(function () {
+                // 解决三方插件不复制内联样式的问题：手动组合所有 style 标签内容
+                let styles = "";
+                $("style").each(function () {
+                    styles += $(this).prop('outerHTML');
+                });
+
+                $("#printArea").printArea({
+                    extraHead: styles
+                });
+            })
+
+            $("#showAnswersButton").click(function () {
+                let btn = $(this);
+                let showing = btn.data("showing") === "true";
+                if (showing) {
+                    $(".answer-text").remove();
+                    btn.text("答案").removeClass("btn-primary").addClass("btn-outline-primary");
+                    btn.data("showing", "false");
+                } else {
+                    $("td").each(function () {
+                        let td = $(this);
+                        let ans = td.data("answer");
+                        if (ans !== undefined && ans !== "") {
+                            td.append(`<span class="answer-text" style="color: #d9534f; font-weight: bold; margin-left: 5px;">${ans}</span>`);
+                        }
+                    });
+                    btn.text("隐藏").removeClass("btn-outline-primary").addClass("btn-primary");
+                    btn.data("showing", "true");
+                }
+            });
+
+            $("#q_number").change(function () {
+                let num = $(this).val();
+                if (num === "100") {
+                    $("#q_part").val("1").prop("disabled", true);
+                } else {
+                    $("#q_part").prop("disabled", false);
+                }
+                updateRatio();
+                $("#printArea").empty();
+            }).trigger('change');
+
+            $("#q_part").change(function () {
+                $("#printArea").empty();
+            });
+
+            $("#q_generate").click(function () {
+                $("#printArea").empty();
+                $("#showAnswersButton").text("答案").removeClass("btn-primary").addClass("btn-outline-primary").data("showing", "false");
+                let q_number = $("#q_number option:selected").val()
+                let q_type = $("#q_type option:selected").val()
+                let q_part = +$("#q_part option:selected").val()
+                let q_mul_count = +$("#q_mul_num").val()
+                let q_bracket_count = +$("#q_bracket_num").val()
+
+                let mode_enabled = $("#q_mode_enable").is(":checked")
+                let mode_type = $("#q_mode_select").val()
+                let q_hard_mode = mode_enabled && (mode_type === "hard")
+                let q_teach_mode = mode_enabled && (mode_type === "teach")
+
+                let html = '<section class="sheet padding-5mm">';
+                for (let p = 1; p < q_part + 1; p++) {
+                    let data = generate(q_number, q_type, q_mul_count, q_bracket_count, q_hard_mode, q_teach_mode)
+                    let problems = data['problems']
+
+                    html += "<table>"
+                    html += "<tbody>"
+                    html += "<tr>"
+                    for (let i = 1; i < problems.length + 1; i++) {
+                        html += `<td data-answer="${data['answers'][i - 1]}">${problems[i - 1]}</td>`;
+                        if (Math.round(i % 4) === 0) {
+                            html += "</tr>"
+                            html += "<tr>"
+                        }
+                    }
+                    html += "</tr>"
+                    html += "</tbody>"
+                    html += "</table>"
+
+                    // 份数之间空一行
+                    if (p < q_part) {
+                        html += '<div style="height: 2.5rem; width: 100%;"></div>';
+                    }
+                }
+                html += '</section>';
+                $("#printArea").append(html);
+            })
+
+        })
+    </script>
+
+</head>
+
+<body>
+    <div class="rainbow-line"></div>
+    <div class="container text-center pt-4">
+
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <div class="input-group pt-2">
+                    <span class="input-group-text">题型</span>
+                    <select class="form-select" id="q_type">
+                        <option value="6">四年级计算</option>
+                        <option value="1">两位数加减法</option>
+                        <option value="3">19*19</option>
+                        <option value="4">三个数加减混合</option>
+                        <option value="5">同分母分数加减法</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="input-group pt-2">
+                    <span class="input-group-text">题数</span>
+                    <select class="form-select" id="q_number">
+                        <option selected value=20>20</option>
+                        <option value=100>100</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="input-group pt-2">
+                    <span class="input-group-text">份数</span>
+                    <select class="form-select" id="q_part">
+                        <option selected value=1>1</option>
+                        <option value=2>2</option>
+                        <option value=4>4</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-1 align-self-center pt-2">
+                <button type="button" class="btn btn-outline-success btn-sm w-100" id="q_generate">生成</button>
+            </div>
+            <div class="col-md-1 align-self-center pt-2">
+                <button type="button" class="btn btn-outline-success btn-sm w-100" id="printButton">打印</button>
+            </div>
+            <div class="col-md-1 align-self-center pt-2">
+                <button type="button" class="btn btn-outline-primary btn-sm w-100" id="showAnswersButton">答案</button>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-3" id="ratio_settings" style="display: none;">
+                <div class="input-group pt-2">
+                    <span class="input-group-text" id="ratio_label_plus_mul">× 比例</span>
+                    <input type="number" class="form-control" id="q_mul_num" value="10" step="5" title="数量1">
+                    <span class="input-group-text" id="ratio_label_minus_div">÷ 比例</span>
+                    <input type="number" class="form-control" id="q_div_num" readonly disabled value="10" title="数量2">
+                </div>
+            </div>
+            <div class="col-md-3" id="bracket_settings" style="display: none;">
+                <div class="input-group pt-2">
+                    <span class="input-group-text">带括号</span>
+                    <input type="number" class="form-control" id="q_bracket_num" value="10" step="5" title="填空数量">
+                    <span class="input-group-text">题</span>
+                </div>
+            </div>
+            <div class="col-md-3" id="mode_settings" style="display: none;">
+                <div class="input-group pt-2">
+                    <div class="input-group-text">
+                        <input class="form-check-input mt-0" type="checkbox" id="q_mode_enable" title="启用模式">
+                    </div>
+                    <select class="form-select" id="q_mode_select">
+                        <option value="hard">困难模式</option>
+                        <option value="teach" id="q_mode_teach_opt">教学模式</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="A4" id="printArea">
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+</body>
+
+</html>
