@@ -101,11 +101,11 @@ import $ from 'jquery';
             $(document).find("link")
                 .filter(function(){ // Requirement: <link> element MUST have rel="stylesheet" to be considered in print document
                         var relAttr = $(this).attr("rel");
-                        return ($.type(relAttr) === 'undefined') == false && relAttr.toLowerCase() == 'stylesheet';
+                        return typeof relAttr === 'string' && relAttr.toLowerCase() === 'stylesheet';
                     })
                 .filter(function(){ // Include if media is undefined, empty, print or all
                         var mediaAttr = $(this).attr("media");
-                        return $.type(mediaAttr) === 'undefined' || mediaAttr == "" || mediaAttr.toLowerCase() == 'print' || mediaAttr.toLowerCase() == 'all'
+                        return typeof mediaAttr === 'undefined' || mediaAttr === false || mediaAttr === "" || mediaAttr.toLowerCase() === 'print' || mediaAttr.toLowerCase() === 'all';
                     })
                 .each(function(){
                         links += '<link type="text/css" rel="stylesheet" href="' + $(this).attr("href") + '" >';
@@ -137,7 +137,7 @@ import $ from 'jquery';
             var copiedInputs = $("input,select,textarea", copy);
             $("input,select,textarea", ele).each(function( i ){
                 var typeInput = $(this).attr("type");
-                if ($.type(typeInput) === 'undefined') typeInput = $(this).is("select") ? "select" : $(this).is("textarea") ? "textarea" : "";
+                if (typeof typeInput === 'undefined' || typeInput === false) typeInput = $(this).is("select") ? "select" : $(this).is("textarea") ? "textarea" : "";
                 var copiedInput = copiedInputs.eq( i );
 
                 if ( typeInput == "radio" || typeInput == "checkbox" ) copiedInput.attr( "checked", $(this).is(":checked") );
