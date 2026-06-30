@@ -160,7 +160,7 @@
         }
     </style>
     <script type="module">
-        import $ from "./scripts/jquery-3.7.1.min.js";
+        import $ from "jquery";
         window.jQuery = window.$ = $;
 
         $(function () {
@@ -263,6 +263,66 @@
                     btn.text("隐藏").removeClass("btn-outline-primary").addClass("btn-primary");
                     btn.data("showing", "true");
                 }
+            });
+
+            $("#downloadImageButton").click(function () {
+                let sheets = $("#printArea .sheet");
+                if (sheets.length === 0) {
+                    alert("请先生成题目！");
+                    return;
+                }
+
+                let btn = $(this);
+                let originalText = btn.text();
+                btn.text("处理中...").prop("disabled", true);
+
+                let now = new Date();
+                let timestamp = now.getFullYear() +
+                    String(now.getMonth() + 1).padStart(2, '0') +
+                    String(now.getDate()).padStart(2, '0') +
+                    String(now.getHours()).padStart(2, '0') +
+                    String(now.getMinutes()).padStart(2, '0') +
+                    String(now.getSeconds()).padStart(2, '0');
+
+                let promises = [];
+                sheets.each(function (index, sheet) {
+                    let $sheet = $(sheet);
+                    let origStyle = $sheet.attr("style") || "";
+                    
+                    // 临时拓宽尺寸（保持 A4 比例：1100 x 1556），确保右侧内容与答案不被截断
+                    $sheet.css({
+                        "width": "1100px",
+                        "height": "1556px",
+                        "max-width": "none"
+                    });
+
+                    let promise = html2canvas(sheet, {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: "#ffffff"
+                    }).then(canvas => {
+                        $sheet.attr("style", origStyle);
+                        let imgData = canvas.toDataURL("image/png");
+                        let link = document.createElement("a");
+                        link.href = imgData;
+                        let filename = sheets.length > 1 ? `${timestamp}_第${index + 1}页.png` : `${timestamp}.png`;
+                        link.download = filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }).catch(err => {
+                        $sheet.attr("style", origStyle);
+                        throw err;
+                    });
+                    promises.push(promise);
+                });
+
+                Promise.all(promises).then(() => {
+                    btn.text(originalText).prop("disabled", false);
+                }).catch(err => {
+                    alert("下载失败，请重试！");
+                    btn.text(originalText).prop("disabled", false);
+                });
             });
 
             $("#q_number").change(function () {
@@ -371,6 +431,9 @@
             </div>
             <div class="col-md-1 align-self-center pt-2">
                 <button type="button" class="btn btn-outline-primary btn-sm w-100" id="showAnswersButton">答案</button>
+            </div>
+            <div class="col-md-1 align-self-center pt-2">
+                <button type="button" class="btn btn-outline-info btn-sm w-100" id="downloadImageButton">下载</button>
             </div>
         </div>
 

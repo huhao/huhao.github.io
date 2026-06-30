@@ -6,8 +6,12 @@ import '../styles/paper.css';
 import '../styles/style.css';
 
 // Import jQuery and attach to window
-import jQuery from './jquery-3.7.1.min.js';
-window.jQuery = window.$ = jQuery;
+import $ from 'jquery';
+window.jQuery = window.$ = $;
+
+// Import html2canvas
+import html2canvas from 'html2canvas';
+window.html2canvas = html2canvas;
 
 // Import plugins and scripts
 import './jquery.PrintArea.js';

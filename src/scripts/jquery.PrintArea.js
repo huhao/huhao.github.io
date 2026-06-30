@@ -26,7 +26,7 @@
  *  @standard   | [string]   | strict, loose, (html5) | Only for popup. For html 4.01, strict or loose document standard, or html 5 standard
  *  @extraHead  | [string]   | ('')                   | comma separated list of extra elements to be appended to the head tag
  */
-import $ from './jquery-3.7.1.min.js';
+import $ from 'jquery';
 
 (function($) {
     var counter = 0;

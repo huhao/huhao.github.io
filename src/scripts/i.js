@@ -1303,27 +1303,30 @@ function solveProblem(p) {
   
   let text = el.textContent.replace(/\s+/g, ' ').trim();
   
-  if (text.includes('(') && text.includes('=')) {
+  if (text.includes('=')) {
     let parts = text.split('=');
     let lhs = parts[0].trim();
-    let rhs = parseFloat(parts[1].trim());
+    let rhsStr = parts[1] ? parts[1].trim() : "";
     
-    let op = lhs.includes('+') ? '+' : '-';
-    let subParts = lhs.split(op);
-    
-    let first = subParts[0].trim();
-    let second = subParts[1].trim();
-    
-    let isFirstBlank = first.includes('(') || first === '';
-    
-    if (op === '+') {
-      let known = isFirstBlank ? parseFloat(second) : parseFloat(first);
-      return rhs - known;
-    } else {
-      if (isFirstBlank) {
-        return rhs + parseFloat(second);
+    if (/\(\s*\)/.test(lhs) && rhsStr !== "") {
+      let rhs = parseFloat(rhsStr);
+      let op = lhs.includes('+') ? '+' : '-';
+      let subParts = lhs.split(op);
+      
+      let first = subParts[0].trim();
+      let second = subParts[1].trim();
+      
+      let isFirstBlank = /\(\s*\)/.test(first) || first === '';
+      
+      if (op === '+') {
+        let known = isFirstBlank ? parseFloat(second) : parseFloat(first);
+        return rhs - known;
       } else {
-        return parseFloat(first) - rhs;
+        if (isFirstBlank) {
+          return rhs + parseFloat(second);
+        } else {
+          return parseFloat(first) - rhs;
+        }
       }
     }
   }
