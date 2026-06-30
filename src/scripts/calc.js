@@ -5,8 +5,9 @@ import 'bootstrap';
 import '../styles/paper.css';
 import '../styles/style.css';
 
-// Import jQuery (automatically attaches to window)
-import './jquery-3.7.1.min.js';
+// Import jQuery and attach to window
+import jQuery from './jquery-3.7.1.min.js';
+window.jQuery = window.$ = jQuery;
 
 // Import plugins and scripts
 import './jquery.PrintArea.js';
